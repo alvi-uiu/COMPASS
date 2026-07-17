@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMPASS</title>
+<meta name="description" content="Research discovery platform for Artificial Intelligence research. Search, rank, trend analysis, and brief generation.">
+<style>
+:root {
+  --black: #000000;
+  --deep: #0a0a0a;
+  --panel: #111111;
+  --border: #1a1a1a;
+  --green: #00ff41;
+  --green-dim: #00cc33;
+  --green-faint: #003300;
+  --amber: #ffb000;
+  --red: #ff2244;
+  --text: #e8ffe8;
+  --muted: #336633;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+@keyframes glowWave {
+  0%, 100% { text-shadow: 0 0 4px var(--green), 0 0 8px var(--green), 0 0 12px var(--green-faint); }
+  25% { text-shadow: 0 0 6px var(--green), 0 0 14px var(--green-dim), 0 0 20px var(--green-faint); }
+  50% { text-shadow: 0 0 10px var(--green), 0 0 20px var(--green), 0 0 30px var(--green-dim); }
+  75% { text-shadow: 0 0 6px var(--green), 0 0 14px var(--green-dim), 0 0 20px var(--green-faint); }
+}
+@keyframes subtitleFade {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--deep); }
+::-webkit-scrollbar-thumb { background: var(--green-faint); }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+::selection { background: var(--green); color: var(--black); }
+
+a { color: var(--green); text-decoration: none; }
+a:hover { color: var(--amber); text-decoration: underline; }
+button {
+  font-family: 'Share Tech Mono', monospace;
+  background: var(--deep);
+  color: var(--green);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+button:hover { background: var(--green-faint); color: var(--green-dim); }
+button:focus { outline: 1px solid var(--green); }
+button.primary { border-color: var(--green); color: var(--green); }
+button.danger { border-color: var(--red); color: var(--red); }
+button.danger:hover { background: #330000; }
+input, textarea, select {
+  font-family: 'Share Tech Mono', monospace;
+  background: var(--deep);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  font-size: 14px;
+}
+input:focus, textarea:focus, select:focus {
+  outline: 1px solid var(--green);
+  border-color: var(--green);
+}
+input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 14px; height: 14px;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 44px 1fr;
+  height: 100vh;
+}
+
+#header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 14px;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+#header .motto {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+  letter-spacing: 3px;
+  animation: subtitleFade 1.5s ease-out;
+}
+#header .status {
+  font-size: 11px;
+  color: var(--muted);
+  position: absolute;
+  right: 14px;
+}
+#header .status span { color: var(--green-dim); }
+
+#sidebar {
+  background: var(--deep);
+  border-right: 1px solid var(--border);
+  padding: 8px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.nav-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.nav-item:hover { color: var(--text); background: var(--panel); }
+.nav-item.active {
+  color: var(--green);
+  border-left-color: var(--green);
+  background: var(--panel);
+}
+.nav-item .badge {
+  float: right;
+  color: var(--amber);
+  font-size: 12px;
+}
+
+.sidebar-brand {
+  font-family: 'VT323', 'Share Tech Mono', monospace;
+  font-size: 22px;
+  color: var(--green);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 14px 14px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+  flex-shrink: 0;
+  animation: glowWave 3s ease-in-out infinite;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#main {
+  padding: 12px 16px;
+  overflow-y: auto;
+  background: var(--black);
+}
+
+.terminal-line {
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+.terminal-line .prompt { color: var(--green); }
+.terminal-line .info { color: var(--muted); }
+.terminal-line .ok { color: var(--green-dim); }
+.terminal-line .warn { color: var(--amber); }
+.terminal-line .err { color: var(--red); }
+.terminal-line .dim { color: var(--muted); font-size: 12px; text-shadow: 0 0 0.3px currentColor; }
+
+.paper-card {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  background: var(--panel);
+  transition: border-color 0.15s;
+}
+.paper-card:hover { border-color: var(--green-faint); }
+.paper-card .title {
+  color: var(--green);
+  font-size: 17px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.paper-card .title:hover { color: var(--amber); }
+.paper-card .meta {
+  color: var(--text);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.paper-card .meta span { margin-right: 10px; }
+.paper-card .abstract {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 3.2em;
+  overflow: hidden;
+  position: relative;
+}
+.paper-card .abstract.expanded { max-height: none; }
+.paper-card .actions { margin-top: 5px; }
+.paper-card .actions button { margin-right: 4px; font-size: 12px; }
+
+.view-title {
+  font-family: 'VT323', monospace;
+  font-size: 26px;
+  color: var(--green);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.search-bar input { flex: 1; }
+.search-bar select { width: 120px; }
+
+.filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.filters label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.filters label:hover { color: var(--text); }
+
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+.leaderboard-entry .rank {
+  color: var(--amber);
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  min-width: 32px;
+}
+.leaderboard-entry .bar {
+  height: 14px;
+  background: var(--green-faint);
+  min-width: 4px;
+  transition: width 0.3s;
+}
+.leaderboard-entry .label {
+  font-size: 12px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collection-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.collection-item .name {
+  color: var(--green-dim);
+  cursor: pointer;
+}
+.collection-item .name:hover { color: var(--amber); }
+.collection-item .count { color: var(--muted); font-size: 11px; text-shadow: 0 0 0.4px currentColor; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  max-width: 900px;
+  width: 95%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+.modal h2 {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  color: var(--green);
+  margin-bottom: 10px;
+}
+.modal .field { margin-bottom: 10px; }
+.modal .field label { display: block; color: var(--muted); font-size: 13px; margin-bottom: 2px; text-shadow: 0 0 0.5px currentColor; }
+.modal .field .value { color: var(--text); font-size: 15px; word-break: break-word; }
+.modal .close-btn {
+  float: right;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+.modal .close-btn:hover { color: var(--red); }
+
+.brief-output {
+  white-space: pre-wrap;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.brief-output .section-header {
+  color: var(--green);
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+.brief-output .stat {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.news-item {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.learn-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+.learn-content h1 {
+  font-family: 'VT323', monospace;
+  font-size: 32px;
+  color: var(--green);
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+  animation: glowWave 3s ease-in-out infinite;
+}
+.learn-content h2 {
+  font-family: 'VT323', monospace;
+  font-size: 22px;
+  color: var(--green);
+  margin: 28px 0 10px;
+  letter-spacing: 0.5px;
+}
+.learn-content h3 {
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: var(--green-dim);
+  margin: 20px 0 8px;
+}
+.learn-content p {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.learn-content strong {
+  color: var(--green);
+}
+.learn-content em {
+  color: var(--amber);
+}
+.learn-content a {
+  color: var(--green);
+  text-decoration: underline;
+  text-decoration-color: var(--green-faint);
+  transition: color 0.15s;
+}
+.learn-content a:hover {
+  color: var(--amber);
+  text-decoration-color: var(--amber);
+}
+.learn-content blockquote {
+  border-left: 3px solid var(--green);
+  padding: 10px 16px;
+  margin: 14px 0;
+  background: var(--panel);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  font-style: italic;
+}
+.learn-content ul, .learn-content ol {
+  margin: 8px 0 12px 20px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.learn-content li {
+  margin-bottom: 4px;
+}
+.learn-content li strong {
+  color: var(--green-dim);
+}
+.learn-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+.learn-content pre {
+  background: var(--deep);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 14px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--green-dim);
+}
+.learn-content code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+}
+.learn-content p code {
+  background: var(--panel);
+  padding: 1px 5px;
+  color: var(--amber);
+}
+.learn-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 14px;
+}
+.learn-content th, .learn-content td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+.learn-content th {
+  background: var(--panel);
+  color: var(--green);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+}
+.learn-content td {
+  color: var(--text);
+}
+.news-item .title { color: var(--text); font-size: 14px; }
+.news-item .meta { color: var(--muted); font-size: 12px; margin-top: 2px; text-shadow: 0 0 0.4px currentColor; }
+.news-item .meta span { margin-right: 12px; }
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-row label { color: var(--muted); font-size: 13px; text-shadow: 0 0 0.4px currentColor; }
+.settings-row input, .settings-row select { width: 80px; text-align: center; }
+
+@media (max-width: 640px) {
+  #app { grid-template-columns: 1fr; grid-template-rows: 44px auto 1fr; }
+  #sidebar { display: flex; overflow-x: auto; padding: 0; border-right: none; border-bottom: 1px solid var(--border); }
+  .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; }
+  .nav-item.active { border-left: none; border-bottom-color: var(--green); }
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="motto">MONITOR | ANALYZE | DISCOVER</div>
+    <div class="status">> <span id="statusText">READY</span></div>
+  </div>
+  <div id="sidebar">
+    <div class="sidebar-brand">COMPASS</div>
+    <button class="nav-item active" data-view="feed">[FEED]</button>
+    <button class="nav-item" data-view="search">[SEARCH]</button>
+    <button class="nav-item" data-view="trending">[TRENDING]</button>
+    <button class="nav-item" data-view="learn">[LEARN]</button>
+    <button class="nav-item" data-view="collections">[COLLECTIONS]</button>
+    <button class="nav-item" data-view="news">[NEWS]</button>
+    <button class="nav-item" data-view="saved">[SAVED] <span class="badge" id="savedBadge">0</span></button>
+    <button class="nav-item" data-view="settings">[SETTINGS]</button>
+    <div class="sidebar-footer">&copy; 2026 Riasad Alvi</div>
+  </div>
+  <div id="main"></div>
+</div>
+
+<script>
+'use strict';
+
+const Modules = {};
+
+// ─── Config ──────────────────────────────────────────────────────────────
+Modules.Config = {
+  oaBase: 'https://api.openalex.org',
+  hnBase: 'https://hn.algolia.com/api/v1',
+  arxivSourceId: 'S4306400194',
+
+  topics: [
+    { id: 'cs.AI', label: 'Artificial Intelligence' },
+    { id: 'cs.LG', label: 'Machine Learning' },
+    { id: 'cs.CL', label: 'NLP' },
+    { id: 'cs.CV', label: 'Computer Vision' },
+    { id: 'cs.RO', label: 'Robotics' },
+    { id: 'cs.CR', label: 'Security' },
+    { id: 'cs.NE', label: 'Neural Computation' },
+    { id: 'cs.IR', label: 'Information Retrieval' },
+    { id: 'cs.HC', label: 'HCI' },
+    { id: 'cs.SE', label: 'Software Engineering' },
+    { id: 'stat.ML', label: 'Statistical ML' },
+    { id: 'eess.SP', label: 'Signal Processing' },
+  ],
+
+  defaultTopics: ['cs.AI', 'cs.LG', 'cs.CL'],
+
+  defaultSettings: {
+    papersPerFetch: 20,
+    lookbackDays: 7,
+    abstractPreviewLength: 250,
+    defaultSort: 'relevance',
+  },
+
+  hnQueries: ['AI', 'machine learning', 'LLM', 'robotics', 'deep learning'],
+};
+
+// ─── State ────────────────────────────────────────────────────────────────
+Modules.State = {
+  papers: [],
+  searchResults: [],
+  saved: [],
+  collections: {},
+  news: [],
+  settings: Object.assign({}, Modules.Config.defaultSettings),
+  selectedTopics: [...Modules.Config.defaultTopics],
+  currentView: 'feed',
+  activePaper: null,
+  briefResult: null,
+  lastSearchQuery: '',
+
+  reset() {
+    this.papers = [];
+    this.searchResults = [];
+    this.news = [];
+    this.activePaper = null;
+    this.briefResult = null;
+    this.lastSearchQuery = '';
+  }
+};
+
+// ─── Utility ──────────────────────────────────────────────────────────────
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return document.querySelectorAll(sel); }
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function truncate(str, len) {
+  if (!str) return '';
+  return str.length > len ? str.slice(0, len) + '...' : str;
+}
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toISOString().slice(0, 10);
+}
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
+}
+function parseXml(text) {
+  const parser = new DOMParser();
+  return parser.parseFromString(text, 'text/xml');
+}
+
+function normalizeId(id) {
+  return id.replace(/https?:\/\//g, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 32);
+}
+
+function deduplicate(list, getId) {
+  const seen = new Set();
+  return list.filter(item => {
+    const key = getId(item);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function setStatus(text) {
+  document.getElementById('statusText').textContent = text;
+}
+
+function parseArxivId(href) {
+  if (!href) return '';
+  const m = href.match(/arxiv\.org\/(?:abs|pdf)\/(.+?)(?:v\d+)?(?:#|$)/);
+  return m ? m[1] : '';
+}
+
+// ─── OpenAlex API (CORS-compatible, no key needed) ──────────────────────
+Modules.OpenAlex = {
+  _decodeAbstract(invertedIndex) {
+    if (!invertedIndex) return '';
+    const words = [];
+    for (const [word, positions] of Object.entries(invertedIndex)) {
+      for (const pos of positions) words[pos] = word;
+    }
+    return words.filter(w => w !== undefined).join(' ');
+  },
+
+  async fetchByTopic(topicLabel, opts = {}) {
+    const limit = opts.limit || 10;
+    const lookbackDays = opts.lookbackDays || 7;
+    const dateFrom = new Date(Date.now() - lookbackDays * 86400000).toISOString().slice(0, 10);
+    const fields = 'id,title,authorships,publication_date,cited_by_count,abstract_inverted_index,primary_location,open_access,concepts';
+    const url = `${Modules.Config.oaBase}/works?filter=primary_location.source.id:${Modules.Config.arxivSourceId},publication_date:>${dateFrom}&search=${encodeURIComponent(topicLabel)}&sort=publication_date:desc&per_page=${limit}&select=${fields}`;
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) return [];
+      const data = await resp.json();
+      return this._parse(data.results || [], topicLabel);
+    } catch (err) {
+      console.error('OpenAlex fetch error:', err);
+      return [];
+    }
+  },
+
+  async search(query, opts = {}) {
+    const limit = opts.limit || 20;
+    const fields = 'id,title,authorships,publication_date,cited_by_count,abstract_inverted_index,primary_location,open_access,concepts';
+    const url = `${Modules.Config.oaBase}/works?search=${encodeURIComponent(query)}&sort=publication_date:desc&per_page=${limit}&select=${fields}`;
+
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) return [];
+      const data = await resp.json();
+      return this._parse(data.results || []);
+    } catch (err) {
+      console.error('OpenAlex search error:', err);
+      return [];
+    }
+  },
+
+  _parse(results, topicLabel) {
+    return results.map(p => {
+      const authors = (p.authorships || []).map(a => a.author?.display_name || '').filter(Boolean);
+      const source = p.primary_location?.source?.display_name || 'openalex';
+      const pdfUrl = p.open_access?.oa_url || p.primary_location?.pdf_url || '';
+      const oaId = p.id || '';
+      const arxivId = oaId.replace('https://openalex.org/W', '');
+      const concepts = (p.concepts || []).slice(0, 5).map(c => c.display_name);
+
+      return {
+        id: normalizeId(oaId),
+        arxivId,
+        title: p.title || '',
+        abstract: this._decodeAbstract(p.abstract_inverted_index),
+        authors,
+        url: p.open_access?.oa_url || oaId,
+        pdfUrl,
+        source: source.toLowerCase().includes('arxiv') ? 'arxiv' : 'openalex',
+        published: p.publication_date || '',
+        categories: topicLabel ? [`topic:${topicLabel}`, ...concepts] : concepts,
+        citations: p.cited_by_count || 0,
+        venue: source,
+        score: 0,
+      };
+    });
+  }
+};
+
+// ─── HN Algolia News ──────────────────────────────────────────────────────
+Modules.News = {
+  async fetch() {
+    const all = [];
+    for (const query of Modules.Config.hnQueries) {
+      try {
+        const url = `${Modules.Config.hnBase}/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=20`;
+        const resp = await fetch(url);
+        if (!resp.ok) continue;
+        const data = await resp.json();
+        if (data.hits) all.push(...data.hits);
+      } catch (err) {
+        console.error('HN fetch error:', err);
+      }
+    }
+    return this._deduplicateAndSort(all);
+  },
+
+  _deduplicateAndSort(hits) {
+    const seen = new Set();
+    const items = [];
+    hits.forEach(h => {
+      const key = h.objectID || h.url || h.title;
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      items.push({
+        id: h.objectID,
+        title: h.title || '',
+        url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
+        hnUrl: `https://news.ycombinator.com/item?id=${h.objectID}`,
+        points: h.points || 0,
+        comments: h.num_comments || 0,
+        createdAt: h.created_at || '',
+        author: h.author || '',
+      });
+    });
+    items.sort((a, b) => {
+      const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return db - da;
+    });
+    return items.slice(0, 50);
+  }
+};
+
+// ─── BM25 Ranking ─────────────────────────────────────────────────────────
+Modules.BM25 = {
+  tokenize(text) {
+    if (!text) return [];
+    const stopWords = new Set([
+      'the','a','an','and','or','but','in','on','at','to','for','of','with',
+      'by','from','is','are','was','were','be','been','being','have','has','had',
+      'do','does','did','will','would','could','should','may','might','can',
+      'this','that','these','those','it','its','we','our','they','their','i',
+      'my','me','he','she','his','her','him','them','what','which','who','whom',
+      'when','where','why','how','all','each','every','both','few','more','most',
+      'other','some','such','no','not','only','own','same','so','than','too',
+      'very','just','about','above','after','again','against','also','any',
+      'because','before','below','between','both','but','by','can','did','do',
+      'does','doing','down','during','each','few','for','from','further','get',
+      'got','had','has','have','having','he','her','here','hers','herself','him',
+      'himself','his','how','i','if','in','into','is','it','its','itself','just',
+      'me','more','most','my','myself','no','nor','not','now','of','off','on',
+      'once','one','only','or','other','our','ours','ourselves','out','over',
+      'own','same','she','so','some','such','than','that','the','their','theirs',
+      'them','themselves','then','there','these','they','this','those','through',
+      'to','too','under','until','up','very','was','we','were','what','when',
+      'where','which','while','who','whom','why','will','with','you','your',
+      'yours','yourself','yourselves',
+    ]);
+
+    const words = text.toLowerCase().match(/[a-z0-9]+/g) || [];
+    return words.filter(w => w.length > 2 && !stopWords.has(w));
+  },
+
+  computeCorpusStats(papers, queryTerms) {
+    const docCount = papers.length;
+    let totalLength = 0;
+    const termFreq = {};
+    queryTerms.forEach(t => { termFreq[t] = 0; });
+    const docLengths = [];
+
+    papers.forEach(p => {
+      const docText = `${p.title} ${p.abstract}`;
+      const tokens = this.tokenize(docText);
+      docLengths.push(tokens.length);
+      totalLength += tokens.length;
+      const docSet = new Set(tokens);
+      queryTerms.forEach(t => {
+        if (docSet.has(t)) termFreq[t]++;
+      });
+    });
+
+    return {
+      docCount,
+      avgDocLength: docCount > 0 ? totalLength / docCount : 0,
+      termFreq,
+      docLengths,
+    };
+  },
+
+  computeBM25(paper, queryTerms, stats, k1 = 1.2, b = 0.75) {
+    if (!queryTerms.length || stats.docCount === 0) return 0;
+    const docText = `${paper.title} ${paper.abstract}`;
+    const tokens = this.tokenize(docText);
+    const docLength = tokens.length;
+
+    let score = 0;
+    queryTerms.forEach(term => {
+      const tf = tokens.filter(t => t === term).length;
+      const n_t = stats.termFreq[term] || 0;
+      const idf = Math.log((stats.docCount - n_t + 0.5) / (n_t + 0.5) + 1);
+      const numerator = tf * (k1 + 1);
+      const denominator = tf + k1 * (1 - b + b * (docLength / (stats.avgDocLength || 1)));
+      score += idf * (numerator / denominator);
+    });
+    return score;
+  },
+
+  rank(papers, query) {
+    if (!papers.length || !query) return papers.map(p => ({ ...p, score: 0 }));
+    const queryTerms = this.tokenize(query);
+    if (!queryTerms.length) return papers.map(p => ({ ...p, score: 0 }));
+
+    const stats = this.computeCorpusStats(papers, queryTerms);
+
+    const scored = papers.map(p => {
+      let score = this.computeBM25(p, queryTerms, stats);
+      const titleTokens = this.tokenize(p.title);
+      const titleMatches = queryTerms.filter(t => titleTokens.includes(t)).length;
+      score += titleMatches * 2.0;
+      return { ...p, score };
+    });
+
+    const maxScore = Math.max(...scored.map(s => s.score), 1);
+    scored.forEach(s => { s.score = s.score / maxScore; });
+    scored.sort((a, b) => b.score - a.score);
+    return scored;
+  },
+
+  rankCombined(papers, query, weights = {}) {
+    const w = Object.assign({ bm25: 0.4, citations: 0.3, recency: 0.2, exact: 0.1 }, weights);
+    if (!papers.length) return [];
+
+    const bm25Ranked = this.rank(papers, query);
+    const bm25Scores = {};
+    bm25Ranked.forEach((p, i) => { bm25Scores[p.id] = 1 - (i / bm25Ranked.length); });
+
+    const maxCitations = Math.max(...papers.map(p => p.citations || 0), 1);
+    const citationNorm = Math.log(maxCitations + 1) || 1;
+
+    const now = Date.now();
+
+    return papers.map(p => {
+      const bm25Score = bm25Scores[p.id] || 0;
+      const citationScore = p.citations > 0 ? Math.log(p.citations + 1) / citationNorm : 0;
+      let recencyScore = 0.5;
+      if (p.published) {
+        const ageMs = now - new Date(p.published).getTime();
+        const ageDays = ageMs / 86400000;
+        recencyScore = Math.max(0, 1 - ageDays / 3650);
+      }
+      const exactMatch = query.toLowerCase().split(' ').some(w => p.title.toLowerCase().includes(w)) ? 1 : 0;
+
+      const combined = bm25Score * w.bm25 + citationScore * w.citations + recencyScore * w.recency + exactMatch * w.exact;
+      return { ...p, score: combined };
+    }).sort((a, b) => b.score - a.score);
+  }
+};
+
+// ─── Markdown Renderer ────────────────────────────────────────────────────
+Modules.Markdown = {
+  render(src) {
+    const lines = src.split('\n');
+    let html = '';
+    let inCode = false;
+    let codeBuf = [];
+    let inTable = false;
+    let inList = false;
+    let listOrdered = false;
+
+    const flushList = () => {
+      if (inList) { html += listOrdered ? '</ol>\n' : '</ul>\n'; inList = false; }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+
+      if (line.startsWith('```')) {
+        if (inCode) {
+          html += `<pre><code>${escapeHtml(codeBuf.join('\n'))}</code></pre>\n`;
+          codeBuf = [];
+        }
+        inCode = !inCode;
+        continue;
+      }
+      if (inCode) { codeBuf.push(line); continue; }
+
+      line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                 .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      line = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, text, url) => {
+        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${text}</a>`;
+      });
+
+      if (line.startsWith('### ')) {
+        flushList(); html += `<h3>${line.slice(4)}</h3>\n`;
+      } else if (line.startsWith('## ')) {
+        flushList(); html += `<h2>${line.slice(3)}</h2>\n`;
+      } else if (line.startsWith('> ')) {
+        flushList(); html += `<blockquote>${line.slice(2)}</blockquote>\n`;
+      } else if (line.startsWith('- ')) {
+        if (!inList) { inList = true; listOrdered = false; html += '<ul>\n'; }
+        html += `<li>${line.slice(2)}</li>\n`;
+      } else if (/^\d+\.\s/.test(line)) {
+        if (!inList) { inList = true; listOrdered = true; html += '<ol>\n'; }
+        html += `<li>${line.replace(/^\d+\.\s/, '')}</li>\n`;
+      } else if (line.startsWith('---')) {
+        flushList(); html += '<hr>\n';
+      } else if (line.startsWith('|') && line.endsWith('|') && lines[i+1] && lines[i+1].startsWith('|') && lines[i+1].includes('-')) {
+        if (!inTable) {
+          inTable = true;
+          html += '<table><thead><tr>';
+          const headers = line.split('|').filter(c => c.trim());
+          headers.forEach(h => { html += `<th>${h.trim()}</th>`; });
+          html += '</tr></thead><tbody>\n';
+          i++;
+        }
+      } else if (line.startsWith('|') && inTable) {
+        html += '<tr>';
+        const cells = line.split('|').filter(c => c.trim());
+        cells.forEach(c => { html += `<td>${c.trim()}</td>`; });
+        html += '</tr>\n';
+      } else if (line.trim() === '' && inTable) {
+        inTable = false;
+        html += '</tbody></table>\n';
+      } else if (line.trim() === '') {
+        flushList();
+      } else {
+        flushList();
+        html += `<p>${line}</p>\n`;
+      }
+    }
+
+    flushList();
+    if (inTable) html += '</tbody></table>\n';
+    if (inCode) html += `<pre><code>${escapeHtml(codeBuf.join('\n'))}</code></pre>\n`;
+
+    return html;
+  }
+};
+
+// ─── Blog Content ──────────────────────────────────────────────────────────
+Modules.Blog = `
+# Understanding Transformers
+
+> Almost every AI system you've heard of — the chatbots, the coding assistants, the image describers, the voice models — runs on the same underlying architecture, called a transformer. And the transformer, stripped of its jargon, is built around a single idea: **attention**. That one mechanism is what let the field leap from "sometimes-coherent autocomplete" to systems that hold a thread across thousands of words. If you understand attention, you understand the load-bearing wall of modern AI.
+
+Here's the whole idea in one sentence: **attention lets every word in a sentence look at every other word and decide which ones matter for interpreting it.** That's it. The rest of this guide unpacks what "look at" means, why it beat the previous generation of models so decisively, and what the intimidating terms — queries, keys, values, multi-head — actually refer to.
+
+## Key Takeaways
+
+- **Attention is the breakthrough.** Transformers replaced older sequence models (RNNs) because attention lets a model relate any two words directly, no matter how far apart, and process them all at once instead of one at a time.
+- **Self-attention is words looking at words.** Each word gathers context from the other words in the sentence, weighting them by relevance, to build a richer version of itself.
+- **Queries, keys, and values are a lookup system.** Each word broadcasts what it's looking for (query), what it offers (key), and what it actually contributes (value). Matches get more weight.
+- **Multi-head attention runs several of these lookups in parallel**, so the model can track grammar, meaning, and reference relationships at the same time.
+- **Transformers have no built-in sense of order**, so word position has to be added in explicitly.
+- Attention is powerful but not free: its cost grows with the square of the input length, which is the root of most "context window" limitations.
+- **Attention is not the whole transformer.** Each layer pairs attention with a small per-word neural network (the feed-forward layer), wrapped in normalization and residual connections.
+
+## Why the Old Way Hit a Wall
+
+Before transformers, the dominant approach to language was the **recurrent neural network** (RNN). The mental model is a reader with a notebook. The model reads one word, updates a running summary, reads the next word, updates again, and so on. Everything it knows about the earlier text is squeezed into that single running summary.
+
+This has two crippling problems.
+
+First, **information decays over distance.** By the time the model reaches the end of a long paragraph, the opening words have been overwritten and diluted many times. If a pronoun at the end refers back to a name at the start, the connection is often already lost.
+
+Second, **RNNs are sequential by construction.** You cannot read word five until you've finished processing word four, because word four's output feeds into word five. That makes them painfully slow to train, because you can't take advantage of hardware that's built to do thousands of things simultaneously.
+
+Attention fixes all of this at once. It lets any word reach any other word in a **single step** — the path length between any two positions is constant, regardless of how far apart they sit — with no relay race and no lossy summary. And because no word's computation depends on having finished the previous word's, the whole sentence is processed in parallel.
+
+## Self-Attention, in Plain Language
+
+Take the sentence: *"The animal didn't cross the street because it was too tired."*
+
+What does "it" refer to — the animal or the street? You know instantly it's the animal, because "tired" applies to animals, not streets. To resolve "it," you didn't reread the sentence from the start holding everything in memory. You just let "it" **look at** the other words and latch onto the one that mattered.
+
+That is self-attention. For every word in the input, the model asks: *given what I am, which other words should I pay attention to in order to understand myself in this context?* The word "it" pays a lot of attention to "animal," a little to "tired," and almost none to "street." The result is a new, context-enriched representation of "it" that effectively carries the meaning "it (= the animal)."
+
+## Queries, Keys, and Values
+
+So how does a word "decide" what to pay attention to? This is where queries, keys, and values come in — the three terms that scare people off. They're actually a familiar idea: **a search or lookup system**, like a dating app or a library catalog.
+
+Every word produces three things:
+
+- A **query**: what am I looking for? ("it" is looking for the noun it refers to.)
+- A **key**: what do I offer, how should others find me? ("animal" advertises itself as a concrete noun that can be an antecedent.)
+- A **value**: what information do I actually pass along if I'm selected? ("animal" hands over its meaning.)
+
+The matching works like this. Each word's query is compared against **every** word's key. A strong match produces a high score; a weak match, a low one. Those scores are turned into weights that add up to 100%. Then each word builds its updated representation by taking a **weighted blend of all the values** — mostly the values of the words it matched strongly, a trace of the rest.
+
+## The Attention Formula
+
+The entire operation fits in one line:
+
+> **Attention(Q, K, V) = softmax( QKᵀ / √d ) V**
+
+Let's take it apart piece by piece:
+
+1. **Build Q, K, V.** Stack every word's embedding into a matrix. Multiply by learned matrices W_Q, W_K, W_V to get queries, keys, and values.
+2. **Score every pair (QKᵀ).** Compare each query against each key by dot product — a square grid of relevance scores.
+3. **Scale by √d.** Prevents the scores from growing too large, keeping gradients stable.
+4. **Softmax into weights.** Squashes scores into positive numbers that sum to 1.
+5. **Blend the values (× V).** Each word's output becomes the weighted sum of all value vectors.
+
+## Why Multiple Heads
+
+A word usually needs to track **several kinds of relationships at once**, and one weighted blend can only express one kind of "relevance" at a time.
+
+**Multi-head attention** solves this by running several independent attention operations in parallel, each with its own separate queries, keys, and values. Each "head" learns to specialize — one tracks subject-verb agreement, another links pronouns to antecedents, another follows word order.
+
+Instead of one person reading the sentence and forming one impression, you have a committee. One member watches grammar, one watches meaning, one watches word order. Their notes are combined into a single richer understanding.
+
+## Inside One Transformer Block
+
+A single transformer block does roughly this, in order:
+
+> **normalize → multi-head attention → add back → normalize → feed-forward → add back**
+
+- **Feed-forward network (FFN):** After attention has mixed information across positions, each word's vector is processed independently through a small two-layer neural network. If attention is the step where words talk to each other, the FFN is the step where each word sits alone and *thinks*.
+- **Residual connections ("add back"):** Instead of replacing a word's vector, the block *adds* the attention output to the original. This lets gradients flow cleanly through deep stacks.
+- **LayerNorm ("normalize"):** Keeps the numbers well-behaved, preventing magnitudes from drifting as vectors accumulate contributions.
+
+## The Residual Stream
+
+Picture a single vector per word flowing straight up through the entire stack, from the first layer to the last. Every attention sublayer and every feed-forward sublayer *reads* from this stream, computes something, and *writes its result back by adding it on.* Nothing is ever overwritten; contributions only accumulate.
+
+Under this view, the layers don't pass a baton so much as they all scribble onto a shared notepad. An early attention head might write "this token is a subject noun" into the stream. A middle-layer head reads that annotation and writes "its verb is three words ahead." A feed-forward layer reads the accumulated context and writes in a factual association.
+
+## The Order Problem
+
+A raw transformer has no idea what order the words are in. To the attention mechanism, a sentence is more like a bag of words all shouting at each other at once. "Dog bites man" and "man bites dog" would look identical, which is obviously catastrophic for language.
+
+The fix is to inject position information directly into each word before attention happens. Every word gets tagged with a signal that encodes *where* it sits in the sequence. The modern default is **rotary position embeddings (RoPE)**, which rotate query and key vectors by an angle proportional to their position so attention naturally depends on *relative* offset rather than absolute position.
+
+## Encoder, Decoder, and Causal Masking
+
+Not all transformers are wired the same way:
+
+- **Encoders** let every word see every other word — past and future. Bidirectional attention is ideal for understanding fixed text (classification, embeddings, analysis).
+- **Decoders** can only look backward via **causal masking**. Before softmax, future-word scores are set to negative infinity, making them invisible. This is what makes a decoder a valid next-word predictor.
+- **Encoder-decoder models** use both, joined by **cross-attention**, where the decoder draws keys and values from the encoder's output.
+
+Every mainstream generative LLM is a decoder-only transformer built on masked, backward-looking attention.
+
+## What Attention Costs
+
+If a sentence has 100 words, each word compares against 100 keys — roughly 10,000 comparisons. Double the length to 200 words and it's 40,000. This **quadratic** growth is why doubling an input can more than double the compute, and it's the root cause behind context-window limits, the higher price of long prompts, and a whole research industry devoted to cheaper approximate attention.
+
+The quadratic term isn't the only cost — feed-forward layers scale linearly and often dominate runtime for short inputs. At inference time, the **KV cache** (keys and values of past tokens) grows linearly with sequence length and can consume more memory than the model's own weights on long conversations.
+
+## Common Misconceptions
+
+- **"Attention is a search that picks the most relevant word."** It's a soft, weighted blend of all words, not a pick. This softness is what makes the whole thing trainable.
+- **"The transformer is just the attention mechanism."** The feed-forward layers hold most of the parameters, and residual connections are what make deep stacks trainable.
+- **"More attention heads always means a smarter model."** Heads split a fixed budget. Beyond a point, extra heads slice the representation too thin.
+- **"Transformers understand word order like we do."** They have no innate sense of order; it's injected by positional encodings.
+- **"Bigger context window means the model reads the whole thing equally well."** Longer window means it *can* attend across the whole input, not that it attends *evenly*.
+
+## The One Thing to Remember
+
+If you forget everything else, keep this: **attention is a mechanism for every element to look at every other element and weight them by relevance, all at once.** That single move — replacing a lossy, sequential summary with direct, parallel, relevance-weighted access — is the difference between the AI of the 2010s and the AI you use today. The model names will keep changing. The heads will multiply, the position schemes will get cleverer, the context windows will stretch. But the load-bearing idea underneath has been remarkably stable.
+`;
+
+// ─── Trends ───────────────────────────────────────────────────────────────
+Modules.Trends = {
+  compute(papers) {
+    if (!papers.length) return [];
+
+    const now = Date.now();
+    const recent = papers.filter(p => {
+      if (!p.published) return false;
+      return (now - new Date(p.published).getTime()) / 86400000 <= 30;
+    });
+
+    if (!recent.length) return [];
+
+    const maxCitations = Math.max(...recent.map(p => p.citations || 0), 1);
+    const maxAuthors = Math.max(...recent.map(p => p.authors?.length || 0), 1);
+
+    const scored = recent.map(p => {
+      const ageDays = (now - new Date(p.published).getTime()) / 86400000;
+      const recencyScore = Math.max(0, 1 - ageDays / 30);
+
+      const citationScore = p.citations > 0 ? Math.log(p.citations + 1) / Math.log(maxCitations + 1) : 0;
+
+      const authorCountScore = Math.min((p.authors?.length || 0) / maxAuthors, 1);
+
+      const aiRelevant = ['artificial intelligence','machine learning','deep learning','natural language processing','computer vision'].some(kw =>
+        (p.categories || []).some(c => c.toLowerCase().includes(kw))
+      ) ? 1 : 0;
+
+      const trend = recencyScore * 0.5 + citationScore * 0.3 + authorCountScore * 0.1 + aiRelevant * 0.1;
+
+      return { ...p, trendScore: trend };
+    });
+
+    scored.sort((a, b) => b.trendScore - a.trendScore);
+    return scored.slice(0, 20);
+  }
+};
+
+// ─── Brief Engine ─────────────────────────────────────────────────────────
+Modules.Briefs = {
+  generate(papers, topic) {
+    if (!papers.length) return '> NO PAPERS TO ANALYZE';
+
+    const lines = [];
+    lines.push('');
+    lines.push('╔══════════════════════════════════════════════════╗');
+    lines.push('║           RESEARCH BRIEF                         ║');
+    lines.push('╚══════════════════════════════════════════════════╝');
+    lines.push('');
+
+    const topicLabel = topic || 'AI Research';
+    lines.push(`  Topic:           ${topicLabel}`);
+    lines.push(`  Papers Analyzed: ${papers.length}`);
+    lines.push(`  Generated:       ${new Date().toISOString().replace('T', ' ').slice(0, 19)} UTC`);
+    lines.push('');
+
+    const topPapers = papers.slice(0, 20);
+
+    const allText = topPapers.map(p => `${p.title} ${p.abstract}`).join(' ');
+    const tokens = Modules.BM25.tokenize(allText);
+    const freq = {};
+    tokens.forEach(t => { freq[t] = (freq[t] || 0) + 1; });
+    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+    const frequentKeywords = sorted.slice(0, 15).map(([k, v]) => `  ${k} (${v}x)`);
+
+    const catFreq = {};
+    topPapers.forEach(p => {
+      (p.categories || []).forEach(c => {
+        catFreq[c] = (catFreq[c] || 0) + 1;
+      });
+    });
+    const topCats = Object.entries(catFreq).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    const authorFreq = {};
+    topPapers.forEach(p => {
+      (p.authors || []).slice(0, 3).forEach(a => {
+        authorFreq[a] = (authorFreq[a] || 0) + 1;
+      });
+    });
+    const topAuthors = Object.entries(authorFreq).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+    const nounPhrases = [];
+    const phrasePattern = /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/g;
+    let m;
+    const phraseText = topPapers.map(p => `${p.title}. ${(p.abstract || '').slice(0, 500)}`).join(' ');
+    while ((m = phrasePattern.exec(phraseText)) !== null) {
+      nounPhrases.push(m[1]);
+    }
+    const phraseFreq = {};
+    nounPhrases.forEach(p => { phraseFreq[p] = (phraseFreq[p] || 0) + 1; });
+    const commonPhrases = Object.entries(phraseFreq)
+      .filter(([, c]) => c >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+
+    const now = Date.now();
+    const recentPapers = topPapers.filter(p => p.published && (now - new Date(p.published).getTime()) / 86400000 <= 60);
+    const catTrends = {};
+    topPapers.forEach(p => {
+      (p.categories || []).forEach(c => {
+        const isRecent = p.published && (now - new Date(p.published).getTime()) / 86400000 <= 14;
+        if (!catTrends[c]) catTrends[c] = { total: 0, recent: 0 };
+        catTrends[c].total++;
+        if (isRecent) catTrends[c].recent++;
+      });
+    });
+    const growingCats = Object.entries(catTrends)
+      .filter(([, v]) => v.total >= 2)
+      .map(([c, v]) => ({ cat: c, ratio: v.recent / v.total }))
+      .sort((a, b) => b.ratio - a.ratio)
+      .slice(0, 5);
+
+    const maxCite = Math.max(...topPapers.map(p => p.citations || 0));
+    const readingOrder = topPapers
+      .slice()
+      .sort((a, b) => {
+        const aCite = a.citations || 0;
+        const bCite = b.citations || 0;
+        if (aCite !== bCite) return bCite - aCite;
+        return (a.published || '') < (b.published || '') ? -1 : 1;
+      })
+      .slice(0, 5);
+
+    // ── Major Themes ──
+    lines.push('  ── MAJOR THEMES ──');
+    if (commonPhrases.length >= 3) {
+      const themes = commonPhrases.slice(0, 5);
+      themes.forEach((p, i) => {
+        lines.push(`  ${i + 1}. ${p[0]}`);
+        lines.push(`     (appears in ${p[1]} papers)`);
+      });
+    } else {
+      const topKW = frequentKeywords.slice(0, 5);
+      topKW.forEach((kw, i) => {
+        lines.push(`  ${i + 1}. ${kw.split(' (')[0]}`);
+      });
+    }
+    lines.push('');
+
+    // ── Frequent Keywords ──
+    lines.push('  ── FREQUENT KEYWORDS ──');
+    frequentKeywords.slice(0, 10).forEach(k => lines.push(k));
+    lines.push('');
+
+    // ── Leading Authors ──
+    lines.push('  ── LEADING AUTHORS ──');
+    if (topAuthors.length) {
+      topAuthors.forEach(([a, c]) => lines.push(`  ${a} (${c} papers)`));
+    } else {
+      lines.push('  (insufficient author data)');
+    }
+    lines.push('');
+
+    // ── Emerging Categories ──
+    lines.push('  ── EMERGING CATEGORIES ──');
+    if (growingCats.length) {
+      growingCats.forEach(g => {
+        const pct = Math.round(g.ratio * 100);
+        lines.push(`  ${g.cat}: ${pct}% recent`);
+      });
+    } else {
+      topCats.forEach(([c, n]) => lines.push(`  ${c}: ${n} papers`));
+    }
+    lines.push('');
+
+    // ── Suggested Reading Order ──
+    lines.push('  ── SUGGESTED READING ORDER ──');
+    readingOrder.forEach((p, i) => {
+      const citeInfo = p.citations ? ` [${p.citations} citations]` : '';
+      lines.push(`  ${i + 1}. ${p.title}${citeInfo}`);
+    });
+    lines.push('');
+
+    return lines.join('\n');
+  }
+};
+
+// ─── Render ───────────────────────────────────────────────────────────────
+Modules.Render = {
+  _main: null,
+
+  init() {
+    this._main = document.getElementById('main');
+  },
+
+  show(view, content) {
+    this._main.innerHTML = content;
+    Modules.State.currentView = view;
+
+    $$('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.view === view);
+    });
+  },
+
+  showLoading() {
+    return '<div class="terminal-line">> <span class="warn">LOADING...</span></div>';
+  },
+
+  showError(msg) {
+    return `<div class="terminal-line">> <span class="err">[ERR] ${escapeHtml(msg)}</span></div>`;
+  },
+
+  showEmpty(msg) {
+    return `<div class="terminal-line">> <span class="warn">${escapeHtml(msg || 'NO RESULTS')}</span></div>`;
+  },
+
+  renderPaperCard(paper, opts = {}) {
+    const showActions = opts.showActions !== false;
+    const showScore = opts.showScore || false;
+    const brief = truncate(paper.abstract || '', Modules.State.settings.abstractPreviewLength);
+
+    const categoryTags = (paper.categories || []).slice(0, 3).map(c =>
+      `<span style="color:var(--muted);font-size:10px;">[${escapeHtml(c)}]</span>`
+    ).join(' ');
+
+    const saved = Modules.State.saved.some(s => s.id === paper.id);
+    const savedLabel = saved ? 'UNSAVE' : 'SAVE';
+    const savedClass = saved ? 'danger' : '';
+
+    const scoreHtml = showScore ? `<span>score: ${(paper.score || paper.trendScore || 0).toFixed(3)}</span>` : '';
+    const trendScoreHtml = paper.trendScore !== undefined ? `<span>trend: ${(paper.trendScore).toFixed(3)}</span>` : '';
+
+    return `
+      <div class="paper-card" data-id="${escapeHtml(paper.id)}">
+        <div class="title" onclick="Modules.Events.openPaper('${escapeHtml(paper.id)}')">${escapeHtml(paper.title)}</div>
+        <div class="meta">
+          <span>${escapeHtml(formatDate(paper.published))}</span>
+          <span>${escapeHtml(paper.authors?.slice(0, 3).join(', ') || '')}${paper.authors?.length > 3 ? ' et al.' : ''}</span>
+          ${paper.citations ? `<span>citations: ${paper.citations}</span>` : ''}
+          ${scoreHtml}
+          ${trendScoreHtml}
+          <span>${escapeHtml(paper.source)}</span>
+        </div>
+        <div class="meta">${categoryTags}</div>
+        <div class="abstract" onclick="this.classList.toggle('expanded')">${escapeHtml(brief)}</div>
+        <div class="actions">
+          <button onclick="Modules.Events.openPaper('${escapeHtml(paper.id)}')">[READ]</button>
+          <button class="${savedClass}" onclick="Modules.Events.toggleSave('${escapeHtml(paper.id)}')">[${savedLabel}]</button>
+          ${paper.collectionBtn || ''}
+          <button onclick="window.open('${escapeHtml(paper.url)}','_blank')">[arXiv]</button>
+        </div>
+      </div>`;
+  },
+
+  renderTopicFilters() {
+    return Modules.Config.topics.map(t => {
+      const checked = Modules.State.selectedTopics.includes(t.id) ? 'checked' : '';
+      return `<label><input type="checkbox" value="${escapeHtml(t.id)}" ${checked} onchange="Modules.Events.toggleTopic('${escapeHtml(t.id)}', this.checked)"> [${checked ? 'x' : ' '}] ${escapeHtml(t.label)}</label>`;
+    }).join('');
+  },
+
+  renderSavedBadge() {
+    const badge = document.getElementById('savedBadge');
+    if (badge) badge.textContent = Modules.State.saved.length;
+  }
+};
+
+// ─── Events ───────────────────────────────────────────────────────────────
+Modules._sortByDate = function(papers) {
+  return papers.slice().sort((a, b) => {
+    const da = a.published ? new Date(a.published).getTime() : 0;
+    const db = b.published ? new Date(b.published).getTime() : 0;
+    return db - da;
+  });
+};
+
+Modules._sortPapers = function(papers, sort, query) {
+  if (sort === 'relevance' && query) {
+    return Modules.BM25.rankCombined(papers, query);
+  } else if (sort === 'recent') {
+    return Modules._sortByDate(papers);
+  } else if (sort === 'citations') {
+    return papers.slice().sort((a, b) => (b.citations || 0) - (a.citations || 0));
+  }
+  return papers;
+};
+
+Modules.Events = {
+  navigate(view) {
+    switch (view) {
+      case 'feed': Modules.App.showFeed(); break;
+      case 'search': Modules.App.showSearch(); break;
+      case 'trending': Modules.App.showTrending(); break;
+      case 'learn': Modules.App.showLearn(); break;
+      case 'collections': Modules.App.showCollections(); break;
+      case 'news': Modules.App.showNews(); break;
+      case 'saved': Modules.App.showSaved(); break;
+      case 'settings': Modules.App.showSettings(); break;
+    }
+  },
+
+  openPaper(id) {
+    const allPapers = [...Modules.State.papers, ...Modules.State.searchResults, ...Modules.State.saved];
+    const paper = allPapers.find(p => p.id === id);
+    if (!paper) return;
+    Modules.State.activePaper = paper;
+    Modules.App.showPaperDetail(paper);
+  },
+
+  closeModal() {
+    const overlay = document.querySelector('.modal-overlay');
+    if (overlay) overlay.remove();
+  },
+
+  toggleSave(id) {
+    const allPapers = [...Modules.State.papers, ...Modules.State.searchResults];
+    const paper = allPapers.find(p => p.id === id) || Modules.State.saved.find(p => p.id === id);
+    if (!paper) return;
+
+    const idx = Modules.State.saved.findIndex(s => s.id === id);
+    if (idx >= 0) {
+      Modules.State.saved.splice(idx, 1);
+    } else {
+      Modules.State.saved.push({ ...paper });
+    }
+    Modules.Render.renderSavedBadge();
+    this.refreshCurrentView();
+  },
+
+  toggleTopic(id, checked) {
+    if (checked) {
+      if (!Modules.State.selectedTopics.includes(id)) Modules.State.selectedTopics.push(id);
+    } else {
+      Modules.State.selectedTopics = Modules.State.selectedTopics.filter(t => t !== id);
+      if (!Modules.State.selectedTopics.length) Modules.State.selectedTopics = [id];
+    }
+  },
+
+  refreshCurrentView() {
+    this.navigate(Modules.State.currentView);
+  },
+
+  collectPaper(id) {
+    const allPapers = [...Modules.State.papers, ...Modules.State.searchResults, ...Modules.State.saved];
+    const paper = allPapers.find(p => p.id === id);
+    if (!paper) return;
+
+    const names = Object.keys(Modules.State.collections);
+    if (names.length === 0) {
+      const name = prompt('New collection name:');
+      if (name && name.trim()) {
+        Modules.State.collections[name.trim()] = [paper];
+        this.refreshCurrentView();
+      }
+    } else {
+      const list = names.map((n, i) => `${i + 1}. ${n} (${Modules.State.collections[n].length})`).join('\n');
+      const choice = prompt(`Add to collection:\n${list}\n\nEnter number or new collection name:`);
+      if (choice) {
+        const idx = parseInt(choice) - 1;
+        const name = !isNaN(idx) && names[idx] ? names[idx] : choice.trim();
+        if (name) {
+          if (!Modules.State.collections[name]) Modules.State.collections[name] = [];
+          if (!Modules.State.collections[name].some(p => p.id === paper.id)) {
+            Modules.State.collections[name].push(paper);
+          }
+          this.refreshCurrentView();
+        }
+      }
+    }
+  },
+
+  createCollection() {
+    const name = prompt('New collection name:');
+    if (name && name.trim()) {
+      if (!Modules.State.collections[name.trim()]) {
+        Modules.State.collections[name.trim()] = [];
+      }
+      this.refreshCurrentView();
+    }
+  },
+
+  renameCollection(oldName) {
+    const newName = prompt('New name:', oldName);
+    if (newName && newName.trim() && newName !== oldName) {
+      Modules.State.collections[newName.trim()] = Modules.State.collections[oldName];
+      delete Modules.State.collections[oldName];
+      this.refreshCurrentView();
+    }
+  },
+
+  deleteCollection(name) {
+    if (confirm(`Delete collection "${name}"?`)) {
+      delete Modules.State.collections[name];
+      this.refreshCurrentView();
+    }
+  },
+
+  exportCollection(name) {
+    const items = Modules.State.collections[name] || [];
+    let text = `COMPASS\nCollection: ${name}\nGenerated: ${new Date().toISOString()}\n\n`;
+    items.forEach((p, i) => {
+      text += `--- Paper ${i + 1} ---\nTitle: ${p.title}\nURL: ${p.url}\nAbstract: ${p.abstract || ''}\n\n`;
+    });
+    this._download(text, `${name.replace(/[^a-z0-9]/gi, '-')}.txt`);
+  },
+
+  exportSaved() {
+    const items = Modules.State.saved;
+    let text = `COMPASS\nGenerated: ${new Date().toISOString()}\n\n`;
+    items.forEach((p, i) => {
+      text += `--- Paper ${i + 1} ---\nTitle: ${p.title}\nURL: ${p.url}\nAbstract: ${p.abstract || ''}\n\n`;
+    });
+    this._download(text, 'saved-papers.txt');
+  },
+
+  exportBrief() {
+    if (Modules.State.briefResult) {
+      this._download(Modules.State.briefResult, 'brief.txt');
+    }
+  },
+
+  _download(text, filename) {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  },
+
+  removeFromCollection(collectionName, paperId) {
+    const col = Modules.State.collections[collectionName];
+    if (col) {
+      Modules.State.collections[collectionName] = col.filter(p => p.id !== paperId);
+      if (Modules.State.collections[collectionName].length === 0) {
+        delete Modules.State.collections[collectionName];
+      }
+      this.refreshCurrentView();
+    }
+  },
+
+  generateBrief() {
+    const topicInput = document.getElementById('briefTopic');
+    const topic = topicInput ? topicInput.value.trim() : '';
+    const papers = Modules.State.papers.length ? Modules.State.papers : Modules.State.searchResults;
+
+    if (!papers.length) {
+      document.getElementById('briefOutput').innerHTML = '<span class="warn">> FETCH PAPERS FIRST (FEED OR SEARCH)</span>';
+      return;
+    }
+
+    setStatus('GENERATING BRIEF...');
+    Modules.State.briefResult = Modules.Briefs.generate(papers, topic || 'AI Research');
+    const output = document.getElementById('briefOutput');
+    if (output) {
+      output.textContent = Modules.State.briefResult;
+    }
+    setStatus('BRIEF READY');
+  },
+
+  doSearch() {
+    const input = document.getElementById('searchInput');
+    const query = input ? input.value.trim() : '';
+    if (!query) return;
+    setStatus('SEARCHING...');
+
+    Modules.OpenAlex.search(query, { limit: 20 }).then(papers => {
+      let all = [...papers];
+      all = Modules._sortPapers(all, Modules.State.settings.defaultSort, query);
+      Modules.State.searchResults = all;
+      Modules.State.lastSearchQuery = query;
+      Modules.App.showSearchResults(query, all);
+      setStatus(`LOADED ${all.length} PAPERS [OK]`);
+    }).catch(err => {
+      console.error(err);
+      setStatus('[ERR] SEARCH FAILED');
+      document.getElementById('searchResults').innerHTML = this.showError('Search failed. Check console.');
+    });
+  },
+
+  doFeedFetch() {
+    const container = document.getElementById('feedPapers');
+    if (!container) return;
+
+    const selectedIds = Modules.State.selectedTopics.length ? Modules.State.selectedTopics : Modules.Config.defaultTopics;
+    const topicConfigs = Modules.Config.topics.filter(t => selectedIds.includes(t.id));
+    setStatus(`FETCHING ${topicConfigs.length} TOPICS...`);
+
+    const perTopic = Math.max(3, Math.ceil(Modules.State.settings.papersPerFetch / topicConfigs.length));
+    const lookback = Modules.State.settings.lookbackDays;
+
+    const promises = topicConfigs.map(topic =>
+      Modules.OpenAlex.fetchByTopic(topic.label, { limit: perTopic, lookbackDays: lookback })
+    );
+
+    Promise.all(promises).then(results => {
+      let all = results.flat();
+      all = deduplicate(all, p => p.id);
+      all = Modules._sortPapers(all, Modules.State.settings.defaultSort, '');
+      Modules.State.papers = all;
+      Modules.App.showFeedPapers(all);
+      setStatus(`LOADED ${all.length} PAPERS [OK]`);
+    }).catch(err => {
+      console.error(err);
+      setStatus('[ERR] FEED FETCH FAILED');
+      container.innerHTML = this.showError('Network error fetching papers.');
+    });
+  },
+
+  doNewsFetch() {
+    const container = document.getElementById('newsItems');
+    if (!container) return;
+
+    setStatus('FETCHING NEWS...');
+    Modules.News.fetch().then(items => {
+      Modules.State.news = items;
+      Modules.App.showNewsItems(items);
+      setStatus(`LOADED ${items.length} NEWS ITEMS [OK]`);
+    }).catch(err => {
+      console.error(err);
+      setStatus('[ERR] NEWS FETCH FAILED');
+    });
+  }
+};
+
+// ─── App ──────────────────────────────────────────────────────────────────
+Modules.App = {
+  init() {
+    Modules.Render.init();
+
+    $$('.nav-item').forEach(el => {
+      el.addEventListener('click', () => {
+        Modules.Events.navigate(el.dataset.view);
+      });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') Modules.Events.closeModal();
+    });
+
+    this.showFeed();
+  },
+
+  showFeed() {
+    const content = `
+      <div class="view-title">> FEED</div>
+      <div class="filters">${Modules.Render.renderTopicFilters()}</div>
+      <div class="search-bar">
+        <button onclick="Modules.Events.doFeedFetch()">[FETCH]</button>
+        <span style="color:var(--muted);font-size:11px;align-self:center;">selected: ${Modules.State.selectedTopics.length} topics</span>
+      </div>
+      <div id="feedPapers">${Modules.Render.showEmpty('PRESS [FETCH] TO LOAD PAPERS')}</div>
+    `;
+    Modules.Render.show('feed', content);
+
+    if (Modules.State.papers.length) {
+      Modules.App.showFeedPapers(Modules.State.papers);
+    }
+  },
+
+  showFeedPapers(papers) {
+    const container = document.getElementById('feedPapers');
+    if (!container) return;
+    if (!papers.length) {
+      container.innerHTML = Modules.Render.showEmpty('NO PAPERS FOUND FOR SELECTED TOPICS');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    const temp = document.createElement('div');
+    temp.innerHTML = papers.map(p => Modules.Render.renderPaperCard(p, { showScore: false })).join('');
+    while (temp.firstChild) frag.appendChild(temp.firstChild);
+    container.innerHTML = '';
+    container.appendChild(frag);
+  },
+
+  showSearch() {
+    const content = `
+      <div class="view-title">> SEARCH</div>
+      <div class="search-bar">
+        <input id="searchInput" type="text" placeholder="enter search query..." onkeydown="if(event.key==='Enter')Modules.Events.doSearch()">
+        <button onclick="Modules.Events.doSearch()">[SEARCH]</button>
+      </div>
+      <div id="searchResults">${Modules.Render.showEmpty('ENTER A QUERY TO SEARCH')}</div>
+    `;
+    Modules.Render.show('search', content);
+
+    if (Modules.State.searchResults.length) {
+      const query = document.getElementById('searchInput');
+      if (query) query.value = Modules.State.lastSearchQuery;
+      Modules.App.showSearchResults(Modules.State.lastSearchQuery, Modules.State.searchResults);
+    }
+
+    setTimeout(() => {
+      const inp = document.getElementById('searchInput');
+      if (inp) inp.focus();
+    }, 50);
+  },
+
+  showSearchResults(query, papers) {
+    const container = document.getElementById('searchResults');
+    if (!container) return;
+    if (!papers.length) {
+      container.innerHTML = Modules.Render.showEmpty('NO RESULTS');
+      return;
+    }
+    container.innerHTML = papers.map(p => Modules.Render.renderPaperCard(p, { showScore: true })).join('');
+  },
+
+  showTrending() {
+    const papers = Modules.State.papers.length ? Modules.State.papers : Modules.State.searchResults;
+    const trending = Modules.Trends.compute(papers);
+    const maxTrend = trending.length ? Math.max(...trending.map(p => p.trendScore), 0.01) : 1;
+
+    let body = '';
+    if (!trending.length) {
+      body = Modules.Render.showEmpty('FETCH PAPERS FIRST (FEED) TO COMPUTE TRENDS');
+    } else {
+      trending.forEach((p, i) => {
+        const pct = (p.trendScore / maxTrend) * 100;
+        const rankStr = String(i + 1).padStart(2, '0');
+        body += `
+          <div class="leaderboard-entry">
+            <span class="rank">#${rankStr}</span>
+            <div class="label" onclick="Modules.Events.openPaper('${escapeHtml(p.id)}')" style="cursor:pointer;">${escapeHtml(truncate(p.title, 70))}</div>
+            <span style="color:var(--muted);font-size:10px;min-width:50px;text-align:right;">${(p.trendScore).toFixed(3)}</span>
+          </div>`;
+      });
+    }
+
+    const content = `
+      <div class="view-title">> TRENDING</div>
+      <div style="margin-bottom:8px;color:var(--muted);font-size:11px;">computing trend score = recency*0.5 + citations*0.3 + authors*0.1 + category*0.1</div>
+      <div id="trendingList">
+        ${body}
+      </div>
+    `;
+    Modules.Render.show('trending', content);
+  },
+
+  showBriefs() {
+    const paperCount = Modules.State.papers.length || Modules.State.searchResults.length || 0;
+    const content = `
+      <div class="view-title">> RESEARCH BRIEF</div>
+      <div style="margin-bottom:8px;color:var(--muted);font-size:11px;">algorithmic analysis of loaded papers (no LLM required)</div>
+      <div class="search-bar">
+        <input id="briefTopic" type="text" placeholder="topic label (optional)" style="flex:1;">
+        <button onclick="Modules.Events.generateBrief()">[GENERATE]</button>
+        <button onclick="Modules.Events.exportBrief()" ${!Modules.State.briefResult ? 'disabled style="opacity:0.5;"' : ''}>[EXPORT]</button>
+      </div>
+      <div style="margin-bottom:6px;color:var(--muted);font-size:11px;">papers available: ${paperCount}</div>
+      <div id="briefOutput" class="brief-output">${Modules.State.briefResult || '> ENTER TOPIC AND PRESS [GENERATE]'}</div>
+    `;
+    Modules.Render.show('briefs', content);
+
+    if (Modules.State.briefResult) {
+      const output = document.getElementById('briefOutput');
+      if (output) output.textContent = Modules.State.briefResult;
+    }
+  },
+
+  showLearn() {
+    const content = `
+      <div class="learn-content">${Modules.Markdown.render(Modules.Blog)}</div>
+    `;
+    Modules.Render.show('learn', content);
+  },
+
+  showCollections() {
+    const names = Object.keys(Modules.State.collections);
+
+    let list = '';
+    if (!names.length) {
+      list = Modules.Render.showEmpty('NO COLLECTIONS YET. SAVE PAPERS TO CREATE ONE.');
+    } else {
+      names.forEach(name => {
+        const items = Modules.State.collections[name];
+        list += `
+          <div class="collection-item">
+            <div>
+              <span class="name" onclick="Modules.App.showCollectionPapers('${escapeHtml(name)}')">${escapeHtml(name)}</span>
+              <span class="count">(${items.length} papers)</span>
+            </div>
+            <div>
+              <button onclick="Modules.Events.renameCollection('${escapeHtml(name)}')">[RENAME]</button>
+              <button onclick="Modules.Events.exportCollection('${escapeHtml(name)}')">[EXPORT]</button>
+              <button class="danger" onclick="Modules.Events.deleteCollection('${escapeHtml(name)}')">[DEL]</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    const content = `
+      <div class="view-title">> COLLECTIONS</div>
+      <div style="margin-bottom:8px;">
+        <button onclick="Modules.Events.createCollection()">[CREATE COLLECTION]</button>
+      </div>
+      <div id="collectionList">${list}</div>
+      <div id="collectionPapers"></div>
+    `;
+    Modules.Render.show('collections', content);
+  },
+
+  showCollectionPapers(name) {
+    const container = document.getElementById('collectionPapers');
+    if (!container) return;
+    const items = Modules.State.collections[name] || [];
+    if (!items.length) {
+      container.innerHTML = Modules.Render.showEmpty('COLLECTION IS EMPTY');
+      return;
+    }
+    const papersWithBtn = items.map(p => {
+      const btn = `<button class="danger" onclick="Modules.Events.removeFromCollection('${escapeHtml(name)}', '${escapeHtml(p.id)}')">[REMOVE]</button>`;
+      return { ...p, collectionBtn: btn };
+    });
+    container.innerHTML = `<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px;"><div class="view-title" style="font-size:16px;">> ${escapeHtml(name)}</div>${papersWithBtn.map(p => Modules.Render.renderPaperCard(p, { showActions: true })).join('')}</div>`;
+  },
+
+  showNews() {
+    const content = `
+      <div class="view-title">> RESEARCH NEWS</div>
+      <div style="margin-bottom:8px;">
+        <button onclick="Modules.Events.doNewsFetch()">[FETCH NEWS]</button>
+      </div>
+      <div id="newsItems">${Modules.Render.showEmpty('PRESS [FETCH NEWS] TO LOAD')}</div>
+    `;
+    Modules.Render.show('news', content);
+
+    if (Modules.State.news.length) {
+      Modules.App.showNewsItems(Modules.State.news);
+    }
+  },
+
+  showNewsItems(items) {
+    const container = document.getElementById('newsItems');
+    if (!container) return;
+    if (!items.length) {
+      container.innerHTML = Modules.Render.showEmpty('NO NEWS ITEMS FOUND');
+      return;
+    }
+    container.innerHTML = items.map(item => `
+      <div class="news-item">
+        <div class="title"><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">${escapeHtml(item.title)}</a></div>
+        <div class="meta">
+          <span>${item.points} points</span>
+          <span>${item.comments} comments</span>
+          <span>${timeAgo(item.createdAt)}</span>
+          <span>by ${escapeHtml(item.author)}</span>
+        </div>
+        <div style="margin-top:2px;">
+          <button onclick="window.open('${escapeHtml(item.hnUrl)}','_blank')">[HN]</button>
+          <button onclick="window.open('${escapeHtml(item.url)}','_blank')">[SOURCE]</button>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  showSaved() {
+    let list = '';
+    if (!Modules.State.saved.length) {
+      list = Modules.Render.showEmpty('NO SAVED PAPERS');
+    } else {
+      list = [...Modules.State.saved].reverse().map(p => {
+        const btn = `<button onclick="Modules.Events.collectPaper('${escapeHtml(p.id)}')">[COLLECT]</button>`;
+        return Modules.Render.renderPaperCard({ ...p, collectionBtn: btn }, { showActions: true });
+      }).join('');
+    }
+
+    const content = `
+      <div class="view-title">> SAVED PAPERS</div>
+      <div style="margin-bottom:8px;">
+        <button onclick="Modules.Events.exportSaved()" ${!Modules.State.saved.length ? 'disabled style="opacity:0.5;"' : ''}>[EXPORT saved-papers.txt]</button>
+        <span style="color:var(--muted);font-size:11px;margin-left:8px;">${Modules.State.saved.length} paper(s) saved</span>
+      </div>
+      <div id="savedList">${list}</div>
+    `;
+    Modules.Render.show('saved', content);
+  },
+
+  showPaperDetail(paper) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    const categories = (paper.categories || []).join(', ') || '(none)';
+    const isSaved = Modules.State.saved.some(s => s.id === paper.id);
+    const saveLabel = isSaved ? 'UNSAVE' : 'SAVE';
+    const saveClass = isSaved ? 'danger' : '';
+
+    overlay.innerHTML = `
+      <div class="modal">
+        <button class="close-btn" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        <h2>${escapeHtml(paper.title)}</h2>
+        <div class="field"><label>AUTHORS</label><div class="value">${escapeHtml(paper.authors?.join(', ') || 'unknown')}</div></div>
+        <div class="field"><label>DATE</label><div class="value">${escapeHtml(formatDate(paper.published))}</div></div>
+        <div class="field"><label>CATEGORIES</label><div class="value">${escapeHtml(categories)}</div></div>
+        <div class="field"><label>SOURCE</label><div class="value">${escapeHtml(paper.source)}</div></div>
+        ${paper.venue ? `<div class="field"><label>VENUE</label><div class="value">${escapeHtml(paper.venue)}</div></div>` : ''}
+        ${paper.citations ? `<div class="field"><label>CITATIONS</label><div class="value">${paper.citations}</div></div>` : ''}
+        <div class="field" style="margin-top:10px;">
+          <label>ABSTRACT</label>
+          <div class="value" style="line-height:1.6;font-size:15px;">${escapeHtml(paper.abstract || 'No abstract available.')}</div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="primary" onclick="window.open('${escapeHtml(paper.url)}','_blank')">[arXiv]</button>
+          <button class="${saveClass}" onclick="Modules.Events.toggleSave('${escapeHtml(paper.id)}');this.closest('.modal-overlay').remove();Modules.Events.refreshCurrentView();">[${saveLabel}]</button>
+          <button onclick="Modules.Events.collectPaper('${escapeHtml(paper.id)}');this.closest('.modal-overlay').remove();">[COLLECT]</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.focus();
+  },
+
+  showSettings() {
+    const s = Modules.State.settings;
+    const topicsSelected = Modules.State.selectedTopics.join(', ');
+    const content = `
+      <div class="view-title">> SETTINGS</div>
+      <div style="margin-bottom:10px;color:var(--muted);font-size:11px;">session-only — no api keys required</div>
+
+      <div class="settings-row">
+        <label>PAPERS PER FETCH</label>
+        <input type="number" id="setPapersPerFetch" value="${s.papersPerFetch}" min="5" max="100" onchange="Modules.State.settings.papersPerFetch=parseInt(this.value)||20">
+      </div>
+      <div class="settings-row">
+        <label>LOOKBACK DAYS</label>
+        <input type="number" id="setLookback" value="${s.lookbackDays}" min="1" max="90" onchange="Modules.State.settings.lookbackDays=parseInt(this.value)||7">
+      </div>
+      <div class="settings-row">
+        <label>ABSTRACT PREVIEW LENGTH</label>
+        <input type="number" id="setAbstractLen" value="${s.abstractPreviewLength}" min="50" max="1000" onchange="Modules.State.settings.abstractPreviewLength=parseInt(this.value)||250">
+      </div>
+      <div class="settings-row">
+        <label>DEFAULT SORT</label>
+        <select id="setDefaultSort" onchange="Modules.State.settings.defaultSort=this.value">
+          <option value="relevance" ${s.defaultSort === 'relevance' ? 'selected' : ''}>RELEVANCE</option>
+          <option value="recent" ${s.defaultSort === 'recent' ? 'selected' : ''}>RECENT</option>
+          <option value="citations" ${s.defaultSort === 'citations' ? 'selected' : ''}>CITATIONS</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <label>ACTIVE TOPICS (${Modules.State.selectedTopics.length})</label>
+        <span style="color:var(--muted);font-size:11px;">${escapeHtml(topicsSelected)}</span>
+      </div>
+      <div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border);">
+        <button onclick="Modules.State.saved=[];Modules.Render.renderSavedBadge();setStatus('SAVED CLEARED');">[CLEAR SAVED PAPERS]</button>
+        <button onclick="Modules.State.collections={};setStatus('COLLECTIONS CLEARED');">[CLEAR COLLECTIONS]</button>
+        <button onclick="Modules.State.reset();Modules.State.selectedTopics=[...Modules.Config.defaultTopics];setStatus('STATE RESET');Modules.App.showFeed();">[RESET ALL]</button>
+      </div>
+    `;
+    Modules.Render.show('settings', content);
+  }
+};
+
+// ─── Boot ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  Modules.App.init();
+});
+</script>
+</body>
+</html>
