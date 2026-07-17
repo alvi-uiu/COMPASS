@@ -1,6 +1,6 @@
 # COMPASS
 
-COMPASS is a lightweight AI research discovery platform that helps researchers, students, and engineers stay up to date with the latest developments in Artificial Intelligence. It aggregates research papers from OpenAlex/arXiv sources, ranks them using BM25-based relevance scoring, identifies emerging trends, and generates concise research briefs.
+COMPASS is a lightweight AI research discovery platform that helps researchers, students, and engineers stay up to date with the latest developments in Artificial Intelligence. It aggregates research papers from OpenAlex/arXiv sources, ranks them using BM25-based relevance scoring, identifies emerging trends.
 
 ## Live 
 
